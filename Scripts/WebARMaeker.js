@@ -28,7 +28,7 @@ class Demo {
         const imageTracking = featuresManager.enableFeature(BABYLON.WebXRFeatureName.IMAGE_TRACKING, "latest", {
             images: [
                 {
-                    src: "https://cdn.babylonjs.com/imageTracking.png",
+                    src: "https://anandp803.github.io/VideoURL/DrSudhakar-PosterA3.jpg",
                     estimatedRealWorldWidth: 0.2
                 },
             ]
