@@ -20,8 +20,64 @@ class Demo {
         scene.createDefaultEnvironment({ createGround: false, createSkybox: false });
         const root = new BABYLON.TransformNode("root", scene);
         // root.setEnabled(false);
-        const model = await BABYLON.SceneLoader.ImportMeshAsync("", "https://piratejc.github.io/assets/", "valkyrie_mesh.glb", scene);
-        model.meshes[0].parent = root;
+       // const model = await BABYLON.SceneLoader.ImportMeshAsync("", "https://piratejc.github.io/assets/", "valkyrie_mesh.glb", scene);
+        //model.meshes[0].parent = root;
+
+        
+        var planeOpts = {
+            height:1,
+            width:0.5,
+            sideOrientation: BABYLON.Mesh.DOUBLESIDE
+        };
+
+        var ANote0Video = BABYLON.MeshBuilder.CreatePlane("plane", planeOpts, scene);
+        ANote0Video.parent = root;
+        ANote0Video.setPivotPoint(new BABYLON.Vector3(0, 0, 0));
+        //var vidPos = (new BABYLON.Vector3(0,0,0.1));
+        //ANote0Video.position = vidPos;
+        var ANote0VideoMat = new BABYLON.StandardMaterial("m", scene);
+        var ANote0VideoVidTex = new BABYLON.VideoTexture("vidtex","https://anandp803.github.io/VideoURL/AR%20Rahman%20alpha_Vp8_vorbis.webm", scene,false);
+        ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
+        ANote0VideoVidTex.hasAlpha=true;
+        ANote0VideoVidTex.video.muted=true;
+        ANote0VideoVidTex.video.autoplay=false;
+
+        ANote0VideoMat.roughness = 1;
+        ANote0VideoMat.emissiveColor = new BABYLON.Color3.White();
+        ANote0Video.material = ANote0VideoMat;
+
+        //  // GUI
+        var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        var isPlayingvideo=false;
+        var AbtnInsideAR = BABYLON.GUI.Button.CreateSimpleButton("but1", "Play");
+        AbtnInsideAR.width = "250px"
+        AbtnInsideAR.height = "100px";
+        AbtnInsideAR.left = "0px";
+        AbtnInsideAR.top = "800px"; 
+        AbtnInsideAR.color = "white";
+        AbtnInsideAR.children[0].color = "black";
+        AbtnInsideAR.children[0].fontSize = 50;
+        AbtnInsideAR.color = "#FF7979";
+        AbtnInsideAR.background = "white";
+        AbtnInsideAR.isVisible=false;
+
+        AbtnInsideAR.onPointerClickObservable.add(() => {
+            if(isplaced==false)
+            {
+                if (ANote0VideoVidTex.video.paused) {
+                ANote0VideoVidTex.video.play();
+                AbtnInsideAR.textBlock.text = "Play";
+                ANote0VideoVidTex.video.muted = false; // Unmute on play
+                }else{
+                    ANote0VideoVidTex.video.pause();
+                AbtnInsideAR.textBlock.text = "Pause";
+                ANote0VideoVidTex.video.muted = true;
+                }
+            }
+        });
+
+        advancedTexture.addControl(AbtnInsideAR);
+
         root.rotationQuaternion = new BABYLON.Quaternion();
         const xr = await scene.createDefaultXRExperienceAsync(options);
         const featuresManager = xr.baseExperience.featuresManager;
@@ -39,6 +95,17 @@ class Demo {
             root.setEnabled(true);
             root.translate(BABYLON.Axis.Y, 0.1, BABYLON.Space.LOCAL);
         });
+
+
+        xr.baseExperience.sessionManager.onXRSessionInit.add(() => {
+            console.log("Session started")
+            AbtnInsideAR.isVisible=true;             
+        });
+    
+        xr.baseExperience.sessionManager.onXRSessionEnded.add(() => {
+            console.log("Session Ended");
+            AbtnInsideAR.isVisible=false; 
+        })
         return xr;
     }
 }
