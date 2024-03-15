@@ -32,7 +32,7 @@ class Demo {
         };
 
         var ANote0Video = BABYLON.MeshBuilder.CreatePlane("plane", planeOpts, scene);
-        ANote0Video.rotationQuaternion = new BABYLON.Quaternion(new BABYLON.Vector3(0,90,0));
+        ANote0Video.rotationQuaternion = new BABYLON.Quaternion(new BABYLON.Vector3(0,0,0));
         ANote0Video.parent = root;
         ANote0Video.setPivotPoint(new BABYLON.Vector3(0, 0, 0));
         //var vidPos = (new BABYLON.Vector3(0,0,0.1));
