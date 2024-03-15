@@ -14,6 +14,7 @@ var startRenderLoop = function (engine, canvas) {
 var engine = null;
 var scene = null;
 var sceneToRender = null;
+var isplaced=true;
 var createDefaultEngine = function() { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false}); };
 class Demo {
     static async SetupXR(scene, options) {
@@ -94,6 +95,7 @@ class Demo {
             // root.setPreTransformMatrix(image.transformationMatrix);
             image.transformationMatrix.decompose(root.scaling, root.rotationQuaternion, root.position);
             root.setEnabled(true);
+            isplaced=false;
             root.translate(BABYLON.Axis.Y, 0.1, BABYLON.Space.LOCAL);
         });
 
@@ -106,6 +108,7 @@ class Demo {
         xr.baseExperience.sessionManager.onXRSessionEnded.add(() => {
             console.log("Session Ended");
             AbtnInsideAR.isVisible=false; 
+            isplaced=true;
         })
         return xr;
     }
@@ -128,8 +131,7 @@ class Playground {
     }
 }
 createScene = function() { return Playground.CreateScene(engine, engine.getRenderingCanvas()); }
-        window.initFunction = async function() {
-            
+        window.initFunction = async function() {          
             
             
             var asyncEngineCreation = async function() {
