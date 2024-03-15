@@ -46,7 +46,7 @@ class Playground {
     static async CreateScene(engine, canvas) {
         const scene = new BABYLON.Scene(engine);
 
-        ARbtn.addEventListener("click" ,function(){
+        MarkerARbtn.addEventListener("click" ,function(){
             var AR=document.querySelector(".babylonVRicon");
             AR.click();    
         }); 
