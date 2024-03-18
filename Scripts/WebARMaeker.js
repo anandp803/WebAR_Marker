@@ -26,29 +26,36 @@ class Demo {
 
         
         var planeOpts = {
-            height:0.2,
+            height:0.13,
             width:0.2,
             sideOrientation: BABYLON.Mesh.DOUBLESIDE
         };
 
-        var ANote0Video = BABYLON.MeshBuilder.CreatePlane("plane", planeOpts, scene);
-        ANote0Video.rotationQuaternion = new BABYLON.Quaternion(new BABYLON.Vector3(0,0,0));
-        ANote0Video.parent = root;
+        var ANote0Video = BABYLON.MeshBuilder.CreatePlane("plane", planeOpts, scene); 
+        ANote0Video.setPivotPoint(new BABYLON.Vector3(0, 0, 0));       
+        ANote0Video.parent = root;  
+        const childMesh = root.getChildren()[0]; // Assuming the first child
+        console.log("childmesh",childMesh)
+        if (childMesh) {
+            childMesh.rotation =new BABYLON.Vector3.Zero();
+            childMesh.position=new BABYLON.Vector3.Zero();
+        }
+
         ANote0Video.setPivotPoint(new BABYLON.Vector3(0, 0, 0));
         //var vidPos = (new BABYLON.Vector3(0,0,0.1));
         //ANote0Video.position = vidPos;
         var ANote0VideoMat = new BABYLON.StandardMaterial("m", scene);
-        var ANote0VideoVidTex = new BABYLON.VideoTexture("vidtex","https://anandp803.github.io/VideoURL/AR%20Rahman%20alpha_Vp8_vorbis.webm", scene,false);
+        var ANote0VideoVidTex = new BABYLON.VideoTexture("vidtex","https://anandp803.github.io/VideoURL/DrSudhakar.webm", scene,false);
         ANote0VideoMat.diffuseTexture = ANote0VideoVidTex;
-        ANote0VideoVidTex.hasAlpha=true;
+        //ANote0VideoVidTex.hasAlpha=true;
         ANote0VideoVidTex.video.muted=true;
         ANote0VideoVidTex.video.autoplay=false;
 
         ANote0VideoMat.roughness = 1;
         ANote0VideoMat.emissiveColor = new BABYLON.Color3.White();
-        ANote0Video.material = ANote0VideoMat;
+         ANote0Video.material = ANote0VideoMat;
 
-        //  // GUI
+        // GUI play pause button
         var advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
         var isPlayingvideo=false;
         var AbtnInsideAR = BABYLON.GUI.Button.CreateSimpleButton("but1", "Play");
@@ -77,8 +84,51 @@ class Demo {
                 }
             }
         });
-
         advancedTexture.addControl(AbtnInsideAR);
+        //end play pause btn4
+
+        // //screenshot button
+
+        // function takeScreenshot() {
+        //     console.log("1")
+        //     html2canvas(canvas).then(canvas => {
+        //         console.log("2")
+        //         let screenshot = canvas.toDataURL(); // Convert canvas to base64 image
+        //         download(screenshot, 'screenshot.png'); // Download the image
+        //     });
+        // }
+
+        // function download(data, filename) {
+        //     const anchor = document.createElement('a');
+        //     anchor.href = data;
+        //     anchor.download = filename;
+        //     anchor.style.display = 'none';
+        //     document.body.appendChild(anchor);
+        //     anchor.click();
+        //     document.body.removeChild(anchor);
+        //   }
+        // var Screenshpttexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");        
+        // var ScreenshotbtnInsideAR = BABYLON.GUI.Button.CreateSimpleButton("but2", "Take Screenshot");
+        // ScreenshotbtnInsideAR.width = "250px"
+        // ScreenshotbtnInsideAR.height = "100px";
+        // ScreenshotbtnInsideAR.left = "300px";
+        // ScreenshotbtnInsideAR.top = "800px"; 
+        // ScreenshotbtnInsideAR.color = "white";
+        // ScreenshotbtnInsideAR.children[0].color = "black";
+        // ScreenshotbtnInsideAR.children[0].fontSize = 50;
+        // ScreenshotbtnInsideAR.color = "#FF7979";
+        // ScreenshotbtnInsideAR.background = "white";
+        // ScreenshotbtnInsideAR.isVisible=false;
+
+        // ScreenshotbtnInsideAR.onPointerClickObservable.add(() => {
+        //    //if(isplaced==false)
+        //     //{
+        //         console.log("3");
+        //         takeScreenshot();
+        //     //}
+        // });
+        // Screenshpttexture.addControl(ScreenshotbtnInsideAR);
+        //screenshotbutton
 
         root.rotationQuaternion = new BABYLON.Quaternion();
         const xr = await scene.createDefaultXRExperienceAsync(options);
@@ -92,24 +142,37 @@ class Demo {
             ]
         });
         imageTracking.onTrackedImageUpdatedObservable.add((image) => {
-            // root.setPreTransformMatrix(image.transformationMatrix);
+            //root.setPreTransformMatrix(image.transformationMatrix);
             image.transformationMatrix.decompose(root.scaling, root.rotationQuaternion, root.position);
             root.setEnabled(true);
+            root.rotation= new BABYLON.Vector3(0, 0, 0);
             isplaced=false;
-            root.translate(BABYLON.Axis.Y, 0.1, BABYLON.Space.LOCAL);
+            root.translate(BABYLON.Axis.X,0, BABYLON.Space.LOCAL);
+            
         });
 
 
         xr.baseExperience.sessionManager.onXRSessionInit.add(() => {
             console.log("Session started")
-            AbtnInsideAR.isVisible=true;             
+            AbtnInsideAR.isVisible=true; 
+           // ScreenshotbtnInsideAR.isVisible=true; 
+            xr.baseExperience.start
+            root.setEnabled(true);
         });
     
         xr.baseExperience.sessionManager.onXRSessionEnded.add(() => {
             console.log("Session Ended");
-            AbtnInsideAR.isVisible=false; 
+            AbtnInsideAR.isVisible=false;
+            ANote0VideoVidTex.video.pause();            
+            ANote0VideoVidTex.video.muted = true;
+           // ScreenshotbtnInsideAR.isVisible=false; 
             isplaced=true;
+            AbtnInsideAR.textBlock.text = "Play";
+            root.setEnabled(false);
         })
+
+
+
         return xr;
     }
 }
@@ -122,11 +185,14 @@ class Playground {
             AR.click();    
         }); 
 
-        await Demo.SetupXR(scene, {
+        const xr=await Demo.SetupXR(scene, {
             uiOptions: {
                 sessionMode: "immersive-ar"
             }
-        });
+        });      
+        
+
+
         return scene;
     }
 }
